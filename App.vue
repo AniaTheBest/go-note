@@ -1,4 +1,3 @@
-
 <template>
 <div class="container-fluid p-0 m-0 vh-100">
 <div class="row p-0 m-0 h-100">
@@ -7,34 +6,20 @@
 <i class="bi bi-clipboard-check text-secondary"></i>
 GoNote
 </h3>
-<button type="button" class="btn btn-dark w-100 py-2 rounded-0">
+<button type="button" class="btn btn-dark w-100 py-2 rounded-0" v-on:click="showAddForm()">
 <i class="bi bi-pen-fill"></i>
 Stwórz nową notatkę
 </button>
-<div class="alert alert-secondary m-3 text-center">
+<div v-if="notes.length == 0" class="alert alert-secondary m-3 text-center">
 <i class="bi bi-emoji-frown"></i>
 Jeszcze nie ma żadnych notatek do wyświetlenia
 </div>
-<div class="list-group pt-3 pb-5 px-1">
-<div v-for="note in notes" v-bind:key="note" class="list-group-item">
-<div class="float-end">
-<div class="btn-group" role="group">
-<button type="button" class="btn btn-outline-danger">
-<i class="bi bi-trash-fill"></i>
-</button>
-<button type="button" class="btn btn-outline-secondary">
-<i class="bi bi-eye-fill"></i>
-</button>
-</div>
-</div>
-<h5 class="mb-1">{{ note.name }}</h5>
-<p class="text-muted">Utworzono 14:15 10.03.2021</p>
-</div>
-</div>
+<notes-list v-else v-bind:notes="notes" v-on:onShowNote="showNote($event)" v-on:onDeleteNote="deleteNote($event)"></notes-list>
 </div>
 <div class="col-12 col-md-7 col-lg-8 bg-white p-0">
 <div class="cover d-none d-sm-block"></div>
-<note-add-form v-on:onAddNote="addNote($event)"></note-add-form>
+<note v-if="currentNote !== null" v-bind:note="currentNote" />
+<note-add-form v-else v-on:onAddNote="addNote($event)" />
 </div>
 </div>
 </div>
@@ -53,17 +38,29 @@ Moje konto
 
 <script>
 import NoteAddForm from "./components/NoteAddForm.vue";
+import NotesList from "./components/NotesList.vue";
+import Note from "./components/Note.vue";
 
 export default {
-components: {NoteAddForm},
+components: {NoteAddForm, NotesList, Note},
 data: function (){
 return {
 notes: [],
+currentNote: null,
 }
 },
 methods: {
 addNote: function (note){
 this.notes.push(note);
+},
+showNote: function (note){
+this.currentNote = note;
+},
+deleteNote: function (note){
+this.notes = this.notes.filter((n) => n !== note);
+},
+showAddForm: function (){
+this.currentNote = null;
 },
 },
 }
